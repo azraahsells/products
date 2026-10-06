@@ -130,6 +130,57 @@ button{font-family:inherit}
 .thanks b{font-family:'Cormorant Garamond',serif;font-size:19px;color:var(--tc-dp);display:block;margin-bottom:2px}
 .mini{width:34px;height:26px;flex-shrink:0;border-radius:6px;background:var(--cr-w);display:inline-flex;vertical-align:middle;margin-right:8px;overflow:hidden}
 .mini svg{width:100%;height:100%}
+.mrp{font-size:12px;color:var(--tx3);text-decoration:line-through;font-weight:400;margin-left:4px}
+.off{display:inline-block;font-size:10px;font-weight:700;color:#fff;background:#2E7D32;border-radius:5px;padding:2px 6px;margin-left:4px;vertical-align:2px}
+.packs{display:flex;flex-direction:column;gap:5px;margin-top:8px}
+.pk{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;background:var(--su);border:1.5px solid var(--bd2);border-radius:9px;padding:6px 8px;cursor:pointer;font-family:inherit;transition:all .15s}
+.pk:hover{border-color:var(--tc);background:var(--cr-r)}
+.pk:active{transform:scale(.97)}
+.pk .w{font-size:12px;font-weight:600;color:var(--tx1)}
+.pk .p{font-size:13px;font-weight:700;color:var(--tc-dp);text-align:right;line-height:1.1}
+.pk .p s{display:block;font-size:10px;color:var(--tx3);font-weight:400}
+.pk .plus{width:18px;height:18px;border-radius:50%;background:var(--tc);color:#fff;font-size:13px;line-height:18px;text-align:center;flex-shrink:0}
+.incart{margin-top:8px;background:var(--ol-p);border-radius:9px;padding:6px}
+.incart .lbl{font-size:10px;color:var(--ol);font-weight:600;text-transform:uppercase;letter-spacing:.06em;text-align:center;margin-bottom:4px}
+.save{color:#2E7D32;font-weight:600}
+
+/* info (i) button + sheet */
+.ib{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;border:1.5px solid var(--bd2);background:rgba(255,255,255,.92);color:var(--tc-dp);font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:700;font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(107,58,18,.12);transition:all .15s;z-index:2}
+.ib:hover,.ib:focus-visible{background:var(--tc);color:#fff;border-color:var(--tc);outline:none}
+.ib:active{transform:scale(.92)}
+.ib::after{content:'';position:absolute;inset:-8px}
+#info{position:absolute;inset:0;z-index:70;background:rgba(30,18,9,.45);display:flex;align-items:flex-end;opacity:0;visibility:hidden;transition:opacity .25s var(--ease),visibility 0s linear .25s}
+#info.on{opacity:1;visibility:visible;transition:opacity .25s var(--ease),visibility 0s}
+.isheet{position:relative;width:100%;max-height:85%;overflow-y:auto;background:var(--su);border-radius:22px 22px 0 0;padding:10px 20px 26px;box-shadow:0 -10px 40px rgba(0,0,0,.2);transform:translateY(100%);transition:transform .35s var(--spring)}
+#info.on .isheet{transform:none}
+.igrab{width:42px;height:4px;border-radius:4px;background:var(--bd2);margin:0 auto 12px}
+.ix{position:absolute;top:12px;right:14px;width:34px;height:34px;border-radius:50%;border:1px solid var(--bd);background:var(--cr-w);color:var(--tx1);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.ipic{width:100%;aspect-ratio:2/1;border-radius:var(--r2);background:radial-gradient(circle at 50% 40%,#fff 0%,var(--cr-w) 85%);overflow:hidden;margin-bottom:14px}
+.ipic svg{width:100%;height:100%;display:block}
+.ih{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;color:var(--tc-dp);line-height:1.05}
+.ien{font-size:12px;color:var(--tx3);letter-spacing:.06em;text-transform:uppercase;margin-top:4px}
+.itx{font-size:14px;color:var(--tx2);line-height:1.65;margin-top:12px}
+.inote{font-size:11px;color:var(--tx3);margin-top:14px;line-height:1.5}
+.ibtn{margin-top:16px}
+
+/* loader */
+#loader{position:absolute;inset:0;z-index:50;background:var(--cr);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px;transition:opacity .45s var(--ease)}
+#loader.out{opacity:0;pointer-events:none}
+.ld-bowl{position:relative;width:170px;height:150px}
+.ld-bowl svg{position:absolute;left:0;bottom:0;width:170px}
+.ld-nut{position:absolute;top:0;width:34px;height:34px;animation:drop 1.8s cubic-bezier(.55,0,.6,1) infinite;opacity:0}
+.ld-nut svg{width:100%;height:100%}
+.ld-nut:nth-child(1){left:38px;animation-delay:0s}
+.ld-nut:nth-child(2){left:68px;animation-delay:.45s}
+.ld-nut:nth-child(3){left:98px;animation-delay:.9s}
+.ld-nut:nth-child(4){left:56px;animation-delay:1.35s}
+@keyframes drop{0%{transform:translateY(-30px) rotate(0);opacity:0}15%{opacity:1}70%{transform:translateY(78px) rotate(200deg);opacity:1}85%,100%{transform:translateY(84px) rotate(220deg);opacity:0}}
+.ld-h{font-family:'Cormorant Garamond',serif;font-size:27px;font-weight:600;color:var(--tc-dp);line-height:1.15}
+.ld-s{font-size:13px;color:var(--tx2);min-height:20px;transition:opacity .3s}
+.ld-bar{width:180px;height:5px;border-radius:5px;background:var(--cr-w);overflow:hidden}
+.ld-bar i{display:block;height:100%;width:40%;border-radius:5px;background:linear-gradient(90deg,var(--tc),var(--sf));animation:slide 1.2s ease-in-out infinite}
+@keyframes slide{0%{transform:translateX(-110%)}100%{transform:translateX(280%)}}
+.spam{margin:0 auto 20px;max-width:320px;background:#FFF6DA;border:1px solid #F0C14B;border-radius:12px;padding:10px 14px;font-size:13px;color:#6B4C2A;line-height:1.5}
 .empty,.loadmsg{text-align:center;color:var(--tx3);font-size:14px;padding:40px 10px}
 
 /* cart bar */
@@ -221,11 +272,24 @@ button{font-family:inherit}
   <div class="scr" id="shop-scr">
     <div class="intro">
       <h1>Today's rates</h1>
-      <p>All items are sold <b>raw &amp; loose</b>, weighed fresh for your order. Choose quantity in 250g steps.</p>
+      <p>All items are sold <b>raw &amp; loose</b>, weighed fresh for your order. Choose quantity in 250g steps. Tap <b>&#9432;</b> on any item to know more about it.</p>
       <div class="chips"><span class="chip">No packaging markup</span><span class="chip">Pay after confirmation</span></div>
     </div>
     <div class="sbar"><span>&#128269;</span><input id="srch" type="text" placeholder="Search kaju, badam, pista&hellip;" oninput="renderList()"></div>
-    <div class="list" id="list"><div class="loadmsg">Loading today's rates&hellip;</div></div>
+    <div class="list" id="list"></div>
+  </div>
+  <div id="loader" class="out">
+    <div class="ld-bowl">
+      <div class="ld-nut" id="ln1"></div><div class="ld-nut" id="ln2"></div><div class="ld-nut" id="ln3"></div><div class="ld-nut" id="ln4"></div>
+      <svg viewBox="0 0 170 70" aria-hidden="true"><defs><linearGradient id="bw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C97A42"/><stop offset="1" stop-color="#8C4A1E"/></linearGradient></defs>
+        <ellipse cx="85" cy="66" rx="60" ry="4" fill="#6B3A12" opacity=".12"/>
+        <path d="M12 14h146c0 28-30 48-73 48S12 42 12 14z" fill="url(#bw)"/>
+        <ellipse cx="85" cy="14" rx="73" ry="9" fill="#B5622A"/><ellipse cx="85" cy="14" rx="66" ry="6" fill="#6B3A12" opacity=".55"/>
+        <path d="M30 26c8 14 26 22 44 23" stroke="#fff" stroke-opacity=".25" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+    </div>
+    <div class="ld-h">Getting amazing<br>offers for you&hellip;</div>
+    <div class="ld-s" id="ld-s">Picking the freshest dry fruits</div>
+    <div class="ld-bar"><i></i></div>
   </div>
   <div class="cbar" id="cbar">
     <div class="t"><span id="cb-meta">0 items</span><b id="cb-total">&#8377;0</b></div>
@@ -267,8 +331,23 @@ button{font-family:inherit}
     <div class="done-h">Order received!</div>
     <div class="done-id" id="done-id"></div>
     <p class="done-p" id="done-p"></p>
+    <div class="spam">&#128233; <b>Can't see our email?</b> Please check your <b>Spam / Promotions</b> folder for order updates, and mark us as &ldquo;Not spam&rdquo;.</div>
     <button class="btn-p" onclick="newOrder()" style="max-width:280px">Place another order</button>
     <p style="margin-top:22px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:var(--tx2)">A personal initiative by Gajal &amp; Alim.<br>Thank you for your support &#129293;</p>
+  </div>
+</div>
+
+<!-- ITEM INFO SHEET (opened by the i button) -->
+<div id="info" aria-hidden="true" onclick="if(event.target===this)closeInfo()">
+  <div class="isheet" role="dialog" aria-modal="true" aria-labelledby="i-name">
+    <div class="igrab"></div>
+    <button class="ix" aria-label="Close" onclick="closeInfo()">&times;</button>
+    <div class="ipic" id="i-pic"></div>
+    <div class="ih" id="i-name"></div>
+    <div class="ien" id="i-en"></div>
+    <p class="itx" id="i-txt"></p>
+    <div class="inote">General information only &middot; not medical advice. Enjoy as part of a balanced diet.</div>
+    <button class="btn-s ibtn" onclick="closeInfo()">Got it</button>
   </div>
 </div>
 
@@ -283,9 +362,10 @@ button{font-family:inherit}
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyknP9txrBFzVYoQv-BgYT5h9NNLwREsjjqMeqphxZ2kn54sQlY2_cbfg6SKEfwJpeC/exec';   // e.g. 'https://script.google.com/macros/s/AKfy..../exec'
 
 // Used only in demo mode / if rates can't load. Real rates come from the "Rates" tab.
-const FALLBACK = [
-  {item:'Kaju',rate250:250},{item:'Badam',rate250:250},{item:'Pista',rate250:280},
-  {item:'Anjeer',rate250:280},{item:'Black Manuka',rate250:150},{item:'Akrot',rate250:300}
+const FALLBACK = [   // demo only — live prices come from the Rates tab
+  {item:'Kaju',p250:255,p500:495,p1kg:985,mkt250:300},{item:'Badam',p250:250,p500:490,p1kg:970,mkt250:290},
+  {item:'Pista',p250:280,p500:550,p1kg:1090,mkt250:330},{item:'Anjeer',p250:280,p500:550,p1kg:1090,mkt250:320},
+  {item:'Black Manuka',p250:150,p500:290,p1kg:570,mkt250:180},{item:'Akrot',p250:300,p500:590,p1kg:1170,mkt250:350}
 ];
 let HANDLING_FEE = 30;   // ₹ per order (the sheet's CONFIG.HANDLING_FEE overrides this when live)
 
@@ -338,8 +418,8 @@ const ART = {
     p:'<ellipse fill="G" rx="11" ry="9"/><ellipse cx="-4" cy="-3" rx="3.5" ry="2" fill="#fff" opacity=".35"/>',
     at:[[44,50,0,1.1],[64,44,0,1.2],[82,56,0,1.05],[58,62,0,1]]}
 };
-function art(kind){
-  const a = ART[kind] || ART.generic, id = 'g-' + kind;
+function art(kind, uid){
+  const a = ART[kind] || ART.generic, id = 'g-' + kind + (uid || '');
   const piece = a.p.replace(/fill="G"/g, `fill="url(#${id})"`);
   return `<svg viewBox="0 0 120 90" aria-hidden="true"><defs><radialGradient id="${id}" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="${a.c[0]}"/><stop offset="1" stop-color="${a.c[1]}"/></radialGradient></defs>`
     + `<ellipse cx="62" cy="76" rx="42" ry="6" fill="#6B3A12" opacity=".1"/>`
@@ -348,25 +428,41 @@ function art(kind){
 
 /* ---------- Catalogue: how each Rates-tab item is shown ---------- */
 // match = words that identify it in the Rates tab (Hindi or English)
+// info  = text shown in the (i) popup. If the Rates tab "Description" column has text, that is used instead.
 const CATALOG = [
-  {match:['kaju','cashew'],         en:'Cashew nuts',      art:'cashew'},
-  {match:['badam','almond'],        en:'Almonds',          art:'almond'},
-  {match:['pista','pistachio'],     en:'Pistachios',       art:'pista'},
-  {match:['anjeer','anjir','fig'],  en:'Dried figs',       art:'fig'},
-  {match:['manuka','black raisin','black kishmish'], en:'Black raisins', art:'blackraisin'},
-  {match:['akrot','akhrot','walnut'], en:'Walnut kernels', art:'walnut'},
-  {match:['khajur','date'],         en:'Dates',            art:'date'},
-  {match:['kishmish','golden raisin','raisin'], en:'Golden raisins', art:'goldraisin'},
-  {match:['jardalu','khubani','apricot'], en:'Dried apricots', art:'apricot'},
-  {match:['makhana','fox nut','lotus seed'], en:'Fox nuts', art:'makhana'},
-  {match:['hazelnut'],              en:'Hazelnuts',        art:'hazelnut'},
-  {match:['macadamia'],             en:'Macadamia nuts',   art:'macadamia'},
-  {match:['cranberr'],              en:'Dried cranberries',art:'cranberry'},
-  {match:['chilgoza','pine nut'],   en:'Pine nuts',        art:'chilgoza'}
+  {match:['kaju','cashew'],         en:'Cashew nuts',      art:'cashew',
+   info:"The creamy cashew sailed from Brazil to Goa with Portuguese traders in the 1500s - today India is one of the world's top cashew producers. Packed with magnesium, copper and zinc, it supports strong bones, a healthy heart and good immunity."},
+  {match:['badam','almond'],        en:'Almonds',          art:'almond',
+   info:"Known as the 'king of nuts', almonds trace back to West and Central Asia, with prized varieties from Iran, Afghanistan and California. Rich in Vitamin E, magnesium, protein and fibre, they nourish skin and brain and help keep the heart and blood sugar in check."},
+  {match:['pista','pistachio'],     en:'Pistachios',       art:'pista',
+   info:"Pistachios grew wild in the deserts of Iran and Central Asia and were a favourite of Persian royalty. A source of Vitamin B6, potassium, protein and eye-friendly lutein, they support heart health, sharp vision and lasting fullness."},
+  {match:['anjeer','anjir','fig'],  en:'Dried figs',       art:'fig',
+   info:"One of the oldest fruits cultivated by humans, the fig comes from the Mediterranean and West Asia. Loaded with fibre, calcium, potassium and iron, anjeer aids digestion, strengthens bones and helps maintain healthy blood pressure."},
+  {match:['manuka','black raisin','black kishmish'], en:'Black raisins', art:'blackraisin',
+   info:"Sun-dried seeded black grapes, a traditional favourite from the vineyards of Afghanistan and India. Rich in iron, potassium and antioxidants, black manuka helps build haemoglobin, eases digestion and makes a classic soaked-overnight morning snack."},
+  {match:['akrot','akhrot','walnut'], en:'Walnut kernels', art:'walnut',
+   info:"Brain-shaped and brain-friendly! Walnuts come from ancient Persia and in India grow in the valleys of Kashmir. One of the best plant sources of Omega-3 fats and antioxidants, they support memory and heart health and help fight inflammation."},
+  {match:['khajur','date'],         en:'Dates',            art:'date',
+   info:"Grown in Middle Eastern deserts for over 6,000 years, dates were the trusted energy food of desert travellers. Full of natural sugars, fibre, potassium, magnesium and iron, khajur gives instant energy and supports digestion and stamina."},
+  {match:['kishmish','golden raisin','raisin'], en:'Golden raisins', art:'goldraisin',
+   info:"Golden raisins are sun-dried green grapes - and Sangli and Nashik in Maharashtra are India's raisin capital. A quick source of energy, iron and potassium, kishmish supports digestion and healthy blood, and satisfies sweet cravings naturally."},
+  {match:['jardalu','khubani','apricot'], en:'Dried apricots', art:'apricot',
+   info:"Sun-kissed apricots first grew in Central Asia, and in India they ripen in the high, cold valleys of Ladakh. Rich in Vitamin A, potassium, iron and fibre, jardalu supports healthy eyes and skin and keeps digestion on track."},
+  {match:['makhana','fox nut','lotus seed'], en:'Fox nuts', art:'makhana',
+   info:"Fox nuts are lotus seeds from the ponds of Bihar's Mithila region, which grows most of India's makhana and holds a GI tag. Light, low in fat and rich in protein, magnesium and potassium, they make a guilt-free snack for heart health and weight management."},
+  {match:['hazelnut'],              en:'Hazelnuts',        art:'hazelnut',
+   info:"Most of the world's hazelnuts grow along Turkey's Black Sea coast - the nut behind your favourite chocolate spreads. Rich in Vitamin E, manganese, folate and healthy fats, they support heart health, glowing skin and cell protection."},
+  {match:['macadamia'],             en:'Macadamia nuts',   art:'macadamia',
+   info:"The buttery 'queen of nuts' comes from the rainforests of Queensland, Australia. High in heart-healthy monounsaturated fats, manganese and Vitamin B1, macadamias help maintain good cholesterol and steady energy."},
+  {match:['cranberr'],              en:'Dried cranberries',art:'cranberry',
+   info:"Tangy ruby berries native to the wetlands of North America, harvested by flooding the fields so they float. Rich in antioxidants and fibre, dried cranberries are known for supporting urinary tract health and immunity."},
+  {match:['chilgoza','pine nut'],   en:'Pine nuts',        art:'chilgoza',
+   info:"Rare pine nuts hand-harvested from the high Himalayan forests of Kinnaur (Himachal Pradesh) and Afghanistan. Packed with protein, zinc, iron, magnesium and Vitamin E, chilgoza boosts immunity and energy and is a traditional winter warmer."}
 ];
 // Shown as "Out of stock" until you add them (with a rate) to the Rates tab
 const COMING = ['Khajur','Kishmish','Jardalu','Makhana','Hazelnut','Macadamia','Cranberry','Chilgoza'];
-const meta = n => { const l = n.toLowerCase(); return CATALOG.find(c => c.match.some(m => l.includes(m))) || {en:'', art:'generic'}; };
+const meta = n => { const l = n.toLowerCase(); return CATALOG.find(c => c.match.some(m => l.includes(m))) || {en:'', art:'generic', info:''}; };
+const infoText = x => String(x.description || x.Description || '').trim() || meta(x.item).info || '';
 const STEP = 250;
 const LS_KEY = 'azraah_customer';
 
@@ -382,6 +478,7 @@ function store(k,v){ try{ v===undefined ? localStorage.removeItem(k) : localStor
 function load(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }
 
 function show(id){
+  closeInfo();
   document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-'+id));
   S.view = id;
 }
@@ -423,20 +520,48 @@ $('su-phone').addEventListener('input', e => e.target.value = e.target.value.rep
 function refreshUser(){ $('hi-name').textContent = S.user ? S.user.name.split(' ')[0] : ''; }
 function goShop(){ refreshUser(); show('shop'); if (!S.items.length) loadRates(); }
 
+/* ---------- pricing: best combination of 1kg / 500g / 250g packs ---------- */
+function norm(x){
+  const p250 = Number(x.p250 ?? x.rate250) || 0;
+  return { ...x, p250, p500: Number(x.p500) || p250*2, p1kg: Number(x.p1kg) || p250*4, mkt250: Number(x.mkt250) || 0 };
+}
+function packs(g){ const k = Math.floor(g/1000), h = Math.floor((g%1000)/500), q = Math.round((g%500)/250); return {k,h,q}; }
+function priceFor(x, g){ const {k,h,q} = packs(g); return k*x.p1kg + h*x.p500 + q*x.p250; }
+function mktFor(x, g){ return x.mkt250 ? Math.round(x.mkt250*g/250) : 0; }
+function packText(g){ const {k,h,q} = packs(g); return [k&&`${k}×1kg`, h&&`${h}×500g`, q&&`${q}×250g`].filter(Boolean).join(' + '); }
+
+/* ---------- loader ---------- */
+const LD_MSGS = ['Picking the freshest dry fruits','Comparing with market prices','Weighing out the best deals','Almost there…'];
+let ldTimer;
+function showLoader(){
+  ['cashew','almond','pista','walnut'].forEach((k,i) => $('ln'+(i+1)).innerHTML = art(k).replace('viewBox="0 0 120 90"','viewBox="22 22 76 52"'));
+  let i = 0; $('ld-s').textContent = LD_MSGS[0];
+  clearInterval(ldTimer);
+  ldTimer = setInterval(() => { i = (i+1) % LD_MSGS.length; $('ld-s').style.opacity = 0; setTimeout(()=>{ $('ld-s').textContent = LD_MSGS[i]; $('ld-s').style.opacity = 1; }, 250); }, 1400);
+  $('loader').classList.remove('out');
+}
+function hideLoader(){ clearInterval(ldTimer); $('loader').classList.add('out'); }
+
 async function loadRates(){
+  showLoader();
+  const minWait = new Promise(r => setTimeout(r, 1800));   // let the animation play
+  let ok = true;
   if (!SCRIPT_URL){
-    S.items = FALLBACK.map(x => ({...x, available:true, description:''}));
+    S.items = FALLBACK.map(x => norm({...x, available:true, description:''}));
     $('demo-flag').innerHTML = '<div class="demo">DEMO MODE — add your Apps Script URL to take real orders</div>';
-    return renderList();
+  } else {
+    try{
+      const r = await fetch(SCRIPT_URL);
+      const d = await r.json();
+      if (!d.ok) throw 0;
+      S.items = d.items.map(norm);
+      if (typeof d.handlingFee === 'number') HANDLING_FEE = d.handlingFee;
+    }catch(e){ ok = false; }
   }
-  try{
-    const r = await fetch(SCRIPT_URL);
-    const d = await r.json();
-    if (!d.ok) throw 0;
-    S.items = d.items;
-    if (typeof d.handlingFee === 'number') HANDLING_FEE = d.handlingFee;
-  }catch(e){
-    $('list').innerHTML = '<div class="loadmsg">Couldn’t load today’s rates. Please check your connection and <a href="#" onclick="loadRates();return false" style="color:var(--tc)">try again</a>.</div>';
+  await minWait;
+  hideLoader();
+  if (!ok){
+    $('list').innerHTML = '<div class="loadmsg">Couldn’t load today’s offers. Please check your connection and <a href="#" onclick="loadRates();return false" style="color:var(--tc)">try again</a>.</div>';
     return;
   }
   renderList();
@@ -460,16 +585,49 @@ function renderList(){
 function cardHTML(x){
   const m = meta(x.item), g = S.cart[x.item] || 0;
   const key = esc(x.item).replace(/'/g,"\\'");
-  const ctrl = !x.available ? `<button class="add" disabled>Out of stock</button>`
-    : g ? `<div class="step"><button aria-label="Less" onclick="adj('${key}',-1)">−</button><div class="g">${fg(g)}</div><button aria-label="More" onclick="adj('${key}',1)">+</button></div><div class="amt">${rs(Math.round(x.rate250*g/STEP))}</div>`
-        : `<button class="add" onclick="adj('${key}',1)">+ Add 250g</button>`;
-  const price = x.rate250 ? `<div class="rt">${rs(x.rate250)} <span>/ 250g</span></div><div class="kg">${rs(x.rate250*4)} per kg</div>`
-                          : `<div class="kg" style="margin-top:6px">Back soon</div>`;
+  const off = x.mkt250 > x.p250 ? Math.round((1 - x.p250/x.mkt250)*100) : 0;
+  const price = x.p250
+    ? `<div class="rt">${rs(x.p250)}${x.mkt250 > x.p250 ? `<span class="mrp">${rs(x.mkt250)}</span><span class="off">${off}% OFF</span>` : ''}</div><div class="kg">per 250 g${x.mkt250 > x.p250 ? ' · vs market price' : ''}</div>`
+    : `<div class="kg" style="margin-top:6px">Back soon</div>`;
+  const ibtn = infoText(x) ? `<button class="ib" aria-label="About ${esc(x.item)}" title="About ${esc(x.item)}" onclick="openInfo('${key}')">i</button>` : '';
+  let ctl;
+  if (!x.available) ctl = `<button class="add" disabled>Out of stock</button>`;
+  else {
+    const opts = [[250,x.p250],[500,x.p500],[1000,x.p1kg]].map(([w,p]) =>
+      `<button class="pk" onclick="addPack('${key}',${w})"><span class="w">${fg(w)}</span><span class="p">${rs(p)}${mktFor(x,w) > p ? `<s>${rs(mktFor(x,w))}</s>` : ''}</span><span class="plus">+</span></button>`).join('');
+    ctl = `<div class="packs">${opts}</div>` + (g ? `<div class="incart"><div class="lbl">In your cart</div>
+      <div class="step"><button aria-label="Less" onclick="adj('${key}',-1)">−</button><div class="g">${fg(g)}</div><button aria-label="More" onclick="adj('${key}',1)">+</button></div>
+      <div class="amt">${rs(priceFor(x,g))}${mktFor(x,g) > priceFor(x,g) ? ` · <span class="save">save ${rs(mktFor(x,g)-priceFor(x,g))}</span>` : ''}</div></div>` : '');
+  }
   return `<div class="card ${g?'in':''} ${x.available?'':'oos'}">
-    <div class="pic">${art(m.art)}<span class="tag">${x.available ? 'Raw · Loose' : 'Out of stock'}</span></div>
+    <div class="pic">${art(m.art)}<span class="tag">${x.available ? (off ? off+'% below market' : 'Raw · Loose') : 'Out of stock'}</span>${ibtn}</div>
     <div class="body"><div class="nm">${esc(x.item)}</div>${m.en ? `<div class="en">${esc(m.en)}</div>` : ''}
-      ${price}${x.description ? `<div class="ds">${esc(x.description)}</div>` : ''}
-      <div class="ctl">${ctrl}</div></div></div>`;
+      ${price}
+      <div class="ctl">${ctl}</div></div></div>`;
+}
+
+/* ---------- item info popup ---------- */
+function openInfo(item){
+  const x = S.items.find(i => i.item === item) || { item };
+  const m = meta(item), txt = infoText(x);
+  if (!txt) return;
+  $('i-pic').innerHTML = art(m.art, '-info');
+  $('i-name').textContent = x.item;
+  $('i-en').textContent = m.en || '';
+  $('i-txt').textContent = txt;
+  $('info').classList.add('on');
+  $('info').setAttribute('aria-hidden', 'false');
+  setTimeout(() => $('info').querySelector('.ix').focus(), 50);
+}
+function closeInfo(){
+  const el = $('info'); if (!el || !el.classList.contains('on')) return;
+  el.classList.remove('on'); el.setAttribute('aria-hidden', 'true');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeInfo(); });
+
+function addPack(item, w){
+  S.cart[item] = Math.min(20000, (S.cart[item]||0) + w);
+  renderList(); updBar(); toast(`Added ${fg(w)} ${item}`);
 }
 function adj(item, d){
   const g = Math.max(0, Math.min(20000, (S.cart[item]||0) + d*STEP));
@@ -479,7 +637,7 @@ function adj(item, d){
 function lines(){
   return Object.entries(S.cart).map(([item,g]) => {
     const x = S.items.find(i => i.item === item);
-    return x ? { item, grams:g, rate:x.rate250, amount: Math.round(x.rate250*g/STEP) } : null;
+    return x ? { item, grams:g, amount: priceFor(x,g), mkt: mktFor(x,g) } : null;
   }).filter(Boolean);
 }
 function updBar(){
@@ -493,10 +651,12 @@ function updBar(){
 function goCheckout(){ if (!lines().length) return toast('Add at least one item'); renderCheckout(); show('checkout'); }
 function renderCheckout(){
   const L = lines(), sub = L.reduce((a,l)=>a+l.amount,0), tot = sub + HANDLING_FEE, g = L.reduce((a,l)=>a+l.grams,0);
-  $('sum').innerHTML = L.map(l => `<div class="row"><span style="display:flex;align-items:center"><span class="mini">${art(meta(l.item).art)}</span>${esc(l.item)}&nbsp; <small style="color:var(--tx3)">× ${fg(l.grams)}</small></span><span>${rs(l.amount)}</span></div>`).join('')
+  const saved$ = L.reduce((a,l)=>a + (l.mkt > l.amount ? l.mkt - l.amount : 0), 0);
+  $('sum').innerHTML = L.map(l => `<div class="row"><span style="display:flex;align-items:center"><span class="mini">${art(meta(l.item).art)}</span><span>${esc(l.item)} <small style="color:var(--tx3)">${fg(l.grams)}</small><br><small style="color:var(--tx3)">${packText(l.grams)}</small></span></span><span style="text-align:right">${rs(l.amount)}${l.mkt > l.amount ? `<br><s style="font-size:11px;color:var(--tx3)">${rs(l.mkt)}</s>` : ''}</span></div>`).join('')
     + `<div class="row"><span>Items subtotal (${fg(g)})</span><span>${rs(sub)}</span></div>`
     + (HANDLING_FEE ? `<div class="row"><span>Handling fee</span><span>${rs(HANDLING_FEE)}</span></div>` : '')
-    + `<div class="row tot"><span>Total</span><span>${rs(tot)}</span></div>`;
+    + `<div class="row tot"><span>Total</span><span>${rs(tot)}</span></div>`
+    + (saved$ ? `<div class="note" style="margin-top:10px;text-align:center">&#127881; You save <b>${rs(saved$)}</b> compared to market price</div>` : '');
   $('who').innerHTML = `<b>${esc(S.user.name)}</b><br><small>+91 ${esc(S.user.phone)} · ${esc(S.user.email)}</small>`;
   const saved = load('azraah_addr'); if (saved && !$('co-addr').value) $('co-addr').value = saved;
 }
