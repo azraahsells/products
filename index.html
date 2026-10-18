@@ -185,6 +185,7 @@ button{font-family:inherit}
 @keyframes drop{0%{transform:translateY(-30px) rotate(0);opacity:0}15%{opacity:1}70%{transform:translateY(78px) rotate(200deg);opacity:1}85%,100%{transform:translateY(84px) rotate(220deg);opacity:0}}
 .ld-h{font-family:'Cormorant Garamond',serif;font-size:27px;font-weight:600;color:var(--tc-dp);line-height:1.15}
 .ld-s{font-size:13px;color:var(--tx2);min-height:20px;transition:opacity .3s}
+.ld-note{position:absolute;left:0;right:0;bottom:calc(28px + env(safe-area-inset-bottom,0px));padding:0 24px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:var(--tx2);line-height:1.4}
 .ld-bar{width:180px;height:5px;border-radius:5px;background:var(--cr-w);overflow:hidden}
 .ld-bar i{display:block;height:100%;width:40%;border-radius:5px;background:linear-gradient(90deg,var(--tc),var(--sf));animation:slide 1.2s ease-in-out infinite}
 @keyframes slide{0%{transform:translateX(-110%)}100%{transform:translateX(280%)}}
@@ -684,6 +685,7 @@ input:focus,textarea:focus{outline:none}
     <div class="ld-h">Lighting up Diwali<br>offers for you&hellip;</div>
     <div class="ld-s" id="ld-s">Picking the freshest dry fruits</div>
     <div class="ld-bar"><i></i></div>
+    <div class="ld-note">A personal initiative by Gajal &amp; Alim.<br>Thank you for your support &#129293;</div>
   </div>
 </div>
 
@@ -937,7 +939,7 @@ function art(kind, uid){
 // match = words that identify it in the Rates tab (Hindi or English)
 // info  = text shown in the (i) popup. If the Rates tab "Description" column has text, that is used instead.
 const CATALOG = [
-  {match:['mix','trail'],           en:'Nuts, seeds & dried fruits', art:'mix',
+  {match:['mix','trail'],           en:'Nuts, seeds & dried fruits', art:'mix', sizes:[500,1000],
    info:"Seven favourites in one pouch. The nuts and seeds bring protein and healthy fats, the dried fruits bring natural sweetness and fibre - an easy all-in-one daily handful, tiffin topper or travel snack.",
    inside:[['almond','Badam','Almonds'],['cashew','Kaju','Cashews'],['walnut','Akrot','Walnuts'],['pumpkin','Pumpkin seeds','Kaddu beej'],
            ['goldraisin','Kishmish','Golden raisins'],['blackraisin','Black manuka','Black raisins'],['fig','Anjeer','Dried figs']]},
@@ -1059,22 +1061,45 @@ function showLoader(){
 }
 function hideLoader(){ clearInterval(ldTimer); $('loader').classList.add('out'); }
 
+// Rates are fetched as soon as the page opens (while the customer is on the welcome screen),
+// and the last rates are kept on the phone so returning customers see the shop instantly.
+const RATES_KEY = 'azraah_rates';
+let ratesP = null;
+function fetchRates(){
+  if (!SCRIPT_URL) return Promise.resolve({ ok:true, items: FALLBACK.map(x => ({...x, available:true, description:''})) });
+  return fetch(SCRIPT_URL).then(r => r.json()).then(d => {
+    if (!d.ok) throw 0;
+    try{ localStorage.setItem(RATES_KEY, JSON.stringify({ items:d.items, handlingFee:d.handlingFee, at:Date.now() })); }catch(e){}
+    return d;
+  });
+}
+function useRates(d){
+  S.items = d.items.map(norm);
+  if (typeof d.handlingFee === 'number') HANDLING_FEE = d.handlingFee;
+}
+function cachedRates(){
+  try{ const c = JSON.parse(localStorage.getItem(RATES_KEY));
+       return c && c.items && Date.now() - c.at < 3*864e5 ? c : null; }catch(e){ return null; }
+}
 async function loadRates(){
-  showLoader();
-  const minWait = new Promise(r => setTimeout(r, 1800));   // let the animation play
-  let ok = true;
-  if (!SCRIPT_URL){
-    S.items = FALLBACK.map(x => norm({...x, available:true, description:''}));
-    $('demo-flag').innerHTML = '<div class="demo">DEMO MODE — add your Apps Script URL to take real orders</div>';
-  } else {
-    try{
-      const r = await fetch(SCRIPT_URL);
-      const d = await r.json();
-      if (!d.ok) throw 0;
-      S.items = d.items.map(norm);
-      if (typeof d.handlingFee === 'number') HANDLING_FEE = d.handlingFee;
-    }catch(e){ ok = false; }
+  if (!SCRIPT_URL) $('demo-flag').innerHTML = '<div class="demo">DEMO MODE — add your Apps Script URL to take real orders</div>';
+  if (!ratesP) ratesP = fetchRates();
+  const cached = SCRIPT_URL && cachedRates();
+  if (cached){
+    // show the shop straight away with the last rates, then swap in today's rates
+    useRates(cached); buildAll(); renderAll();
+    ratesP.then(d => {
+      if (JSON.stringify(d.items) === JSON.stringify(cached.items) && d.handlingFee === cached.handlingFee) return;
+      useRates(d); buildAll();
+      Object.keys(S.cart).forEach(n => { const x = byName(n); if (!x || !x.available) delete S.cart[n]; });
+      renderAll(); if (S.view === 'checkout') renderCheckout();
+    }).catch(() => { ratesP = null; });
+    return;
   }
+  showLoader();
+  const minWait = new Promise(r => setTimeout(r, 700));   // just long enough for the animation not to flash
+  let ok = true;
+  try{ useRates(await ratesP); }catch(e){ ok = false; ratesP = null; }
   await minWait;
   hideLoader();
   if (!ok){
@@ -1083,9 +1108,13 @@ async function loadRates(){
   }
   buildAll(); renderAll();
 }
+// start fetching rates the moment the page opens
+ratesP = fetchRates(); ratesP.catch(() => { ratesP = null; });
 
 /* ---------- catalogue grouping ---------- */
 const W = [250, 500, 1000];
+// pack sizes sold for one item (the mixed pack comes in 500 g and 1 kg only)
+const WS = x => meta(x.item).sizes || W;
 const CAT_OF = {cashew:'nuts',almond:'nuts',pista:'nuts',walnut:'nuts',hazelnut:'nuts',macadamia:'nuts',chilgoza:'nuts',
   fig:'fruits',blackraisin:'fruits',goldraisin:'fruits',date:'fruits',apricot:'fruits',cranberry:'fruits',makhana:'more',mix:'more',generic:'more'};
 const CATS = [
@@ -1149,7 +1178,7 @@ function stepper(id, w, n, label, pop){
   return `<div class="stp${pop ? ' pop' : ''}"><button aria-label="Remove one ${label}" onclick="setQty(${id},${w},-1)">−</button><span aria-live="polite">${n}</span><button aria-label="Add one more ${label}" onclick="setQty(${id},${w},1)">+</button></div>`;
 }
 function cardHTML(x){
-  const m = meta(x.item), w = S.sel[x.item] || 250, c = S.cart[x.item] || {}, n = c[w] || 0;
+  const m = meta(x.item), w = S.sel[x.item] || WS(x)[0], c = S.cart[x.item] || {}, n = c[w] || 0;
   const p = pp(x, w), mk = mktFor(x, w), off = mk > p ? Math.round((1 - p/mk)*100) : 0;
   const lbl = `${fg(w)} ${esc(x.item)}`;
   const add = !x.available ? `<span class="pc-na">Back soon</span>`
@@ -1300,14 +1329,14 @@ function renderVar(){
   const x = itemById(VID); if (!x) return;
   const m = meta(x.item), c = S.cart[x.item] || {};
   const perKg = w => Math.round(pp(x,w) * 1000 / w);
-  const best = W.reduce((b,w) => perKg(w) < perKg(b) ? w : b, 250);
+  const sz = WS(x), best = sz.reduce((b,w) => perKg(w) < perKg(b) ? w : b, sz[0]);
   $('v-pic').innerHTML = pic(m.art, 1);
   $('v-name').textContent = x.item;
   $('v-en').textContent = m.en || '';
-  $('v-rows').innerHTML = W.map(w => {
+  $('v-rows').innerHTML = sz.map(w => {
     const p = pp(x,w), mk = mktFor(x,w), n = c[w] || 0, lbl = `${fg(w)} ${esc(x.item)}`;
     return `<div class="vr ${n ? 'on' : ''}">
-      <div class="vr-w">${fg(w)}${w === best && best !== 250 ? '<em>Best value</em>' : ''}</div>
+      <div class="vr-w">${fg(w)}${w === best && best !== sz[0] ? '<em>Best value</em>' : ''}</div>
       <div class="vr-p"><b>${rs(p)}</b>${mk > p ? `<s>${rs(mk)}</s>` : ''}<small>${rs(perKg(w))} per kg</small></div>
       <div>${n ? stepper(x.id, w, n, lbl) : `<button class="addb" aria-label="Add ${lbl}" onclick="setQty(${x.id},${w},1)">ADD</button>`}</div>
     </div>`;
@@ -1354,7 +1383,7 @@ function updBar(bump){
 }
 // honest nudge: when one more 250 g costs less than a normal 250 g pack (it completes a 500 g or 1 kg pack)
 function nudgeFor(x){
-  const g = gramsOf(x.item); if (!g || g + 250 > 20000) return null;
+  const g = gramsOf(x.item); if (!g || g + 250 > 20000 || !WS(x).includes(250)) return null;
   const extra = priceFor(x, g + 250) - priceFor(x, g);
   if (extra >= x.p250) return null;
   const to = (g + 250) % 1000 === 0 ? '1 kg' : '500 g';
@@ -1390,8 +1419,9 @@ async function placeOrder(){
   if (placing) return;
   const address = $('co-addr').value.trim(), notes = $('co-notes').value.trim();
   if (address.length < 8){ show('checkout'); setErr('addr', true); $('co-addr').focus(); return; }
-  const L = lines(); if (!L.length) return;
   placing = true;
+  if (ratesP) await ratesP.catch(() => {});   // never place an order on old saved rates
+  const L = lines(); if (!L.length){ placing = false; return; }
   const btn = $('place-btn'); btn.disabled = true; btn.textContent = 'Placing order…';
   const payload = { action:'order', ...S.user, address, notes, items: L.map(l => ({ item:l.item, grams:l.grams })) };
 
