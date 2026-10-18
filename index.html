@@ -896,12 +896,21 @@ const ART = {
   chilgoza:{c:['#9C6436','#5A3418'],
     p:'<rect fill="G" x="-14" y="-4.5" width="28" height="9" rx="4.5"/><path d="M8-4.5h2a4.5 4.5 0 0 1 0 9h-2z" fill="#F1DFBC"/><rect x="-11" y="-3" width="16" height="1.6" rx=".8" fill="#fff" opacity=".25"/>',
     at:[[42,48,-30,1.05],[62,42,10,1.1],[82,50,50,1.05],[52,62,15,1],[74,64,-20,1]]},
+  mix:{mix:['almond','cashew','blackraisin','walnut','goldraisin','fig'],
+    at:[[40,50,-25,.95],[60,42,20,1],[82,52,-60,.95],[50,64,30,1.1],[72,62,0,.9],[88,44,0,.7]]},
   generic:{c:['#D8B07A','#9C6C38'],
     p:'<ellipse fill="G" rx="11" ry="9"/><ellipse cx="-4" cy="-3" rx="3.5" ry="2" fill="#fff" opacity=".35"/>',
     at:[[44,50,0,1.1],[64,44,0,1.2],[82,56,0,1.05],[58,62,0,1]]}
 };
 function art(kind, uid){
   const a = ART[kind] || ART.generic, id = 'g-' + kind + (uid || '');
+  if (a.mix) {  // a mixed pouch: draw a different dry fruit at each spot
+    const used = [...new Set(a.at.map((_, i) => a.mix[i % a.mix.length]))];
+    const defs = used.map(k => `<radialGradient id="${id}-${k}" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="${ART[k].c[0]}"/><stop offset="1" stop-color="${ART[k].c[1]}"/></radialGradient>`).join('');
+    return `<svg viewBox="0 0 120 90" aria-hidden="true"><defs>${defs}</defs><ellipse cx="62" cy="76" rx="42" ry="6" fill="#6B3A12" opacity=".1"/>`
+      + a.at.map(([x,y,r,sc], i) => { const k = a.mix[i % a.mix.length];
+          return `<g transform="translate(${x} ${y}) rotate(${r}) scale(${sc})">${ART[k].p.replace(/fill="G"/g, `fill="url(#${id}-${k})"`)}</g>`; }).join('') + `</svg>`;
+  }
   const piece = a.p.replace(/fill="G"/g, `fill="url(#${id})"`);
   return `<svg viewBox="0 0 120 90" aria-hidden="true"><defs><radialGradient id="${id}" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="${a.c[0]}"/><stop offset="1" stop-color="${a.c[1]}"/></radialGradient></defs>`
     + `<ellipse cx="62" cy="76" rx="42" ry="6" fill="#6B3A12" opacity=".1"/>`
@@ -912,6 +921,8 @@ function art(kind, uid){
 // match = words that identify it in the Rates tab (Hindi or English)
 // info  = text shown in the (i) popup. If the Rates tab "Description" column has text, that is used instead.
 const CATALOG = [
+  {match:['mix','trail'],           en:'Nuts, seeds & dried fruits', art:'mix',
+   info:"A bit of everything in one pouch - almonds, cashews, walnuts, pistachio-green pumpkin seeds, golden and black raisins and dried figs. Nuts and seeds bring protein and healthy fats, the dried fruits bring natural sweetness and fibre, making it an easy all-in-one daily handful or travel snack."},
   {match:['kaju','cashew'],         en:'Cashew nuts',      art:'cashew',
    info:"The creamy cashew sailed from Brazil to Goa with Portuguese traders in the 1500s - today India is one of the world's top cashew producers. Packed with magnesium, copper and zinc, it supports strong bones, a healthy heart and good immunity."},
   {match:['badam','almond'],        en:'Almonds',          art:'almond',
@@ -942,7 +953,7 @@ const CATALOG = [
    info:"Rare pine nuts hand-harvested from the high Himalayan forests of Kinnaur (Himachal Pradesh) and Afghanistan. Packed with protein, zinc, iron, magnesium and Vitamin E, chilgoza boosts immunity and energy and is a traditional winter warmer."}
 ];
 // Shown as "Out of stock" until you add them (with a rate) to the Rates tab
-const COMING = ['Khajur','Kishmish','Jardalu','Makhana','Hazelnut','Macadamia','Cranberry','Chilgoza'];
+const COMING = ['Khajur','Kishmish','Jardalu','Makhana','Hazelnut','Macadamia','Cranberry','Chilgoza','Mixed dry fruits'];
 const meta = n => { const l = n.toLowerCase(); return CATALOG.find(c => c.match.some(m => l.includes(m))) || {en:'', art:'generic', info:''}; };
 const infoText = x => String(x.description || x.Description || '').trim() || meta(x.item).info || '';
 const STEP = 250;
@@ -1058,7 +1069,7 @@ async function loadRates(){
 /* ---------- catalogue grouping ---------- */
 const W = [250, 500, 1000];
 const CAT_OF = {cashew:'nuts',almond:'nuts',pista:'nuts',walnut:'nuts',hazelnut:'nuts',macadamia:'nuts',chilgoza:'nuts',
-  fig:'fruits',blackraisin:'fruits',goldraisin:'fruits',date:'fruits',apricot:'fruits',cranberry:'fruits',makhana:'more',generic:'more'};
+  fig:'fruits',blackraisin:'fruits',goldraisin:'fruits',date:'fruits',apricot:'fruits',cranberry:'fruits',makhana:'more',mix:'more',generic:'more'};
 const CATS = [
   {id:'all',    name:'All dry fruits', art:'cashew'},
   {id:'nuts',   name:'Nuts',           art:'almond'},
@@ -1071,7 +1082,8 @@ const thumb = k => art(k).replace('viewBox="0 0 120 90"', 'viewBox="24 22 76 60"
 // On the live site photos load from the images/ folder; anywhere else (a preview, a downloaded copy) from the live site.
 const IMG_BASE = /azraahsells\.github\.io$/.test(location.hostname) ? 'images/' : 'https://azraahsells.github.io/products/images/';
 const IMG = Object.fromEntries(Object.entries({ cashew:'kaju', almond:'badam', pista:'pista', fig:'anjeer',
-  blackraisin:'black-raisin', date:'khajur', makhana:'makhana' }).map(([k, f]) => [k, IMG_BASE + f + '.webp']));
+  blackraisin:'black-raisin', date:'khajur', makhana:'makhana',
+  goldraisin:'kishmish', walnut:'akhrot', chilgoza:'chilgoza', mix:'mix' }).map(([k, f]) => [k, IMG_BASE + f + '.webp']));
 const pic = (k, eager) => thumb(k) + (IMG[k] ? `<img class="ph" src="${IMG[k]}" alt="" width="640" height="640" ${eager ? '' : 'loading="lazy"'} decoding="async" onerror="this.remove()">` : '');
 Object.values(IMG).slice(0, 4).forEach(u => { const l = document.createElement('link'); l.rel = 'preload'; l.as = 'image'; l.href = u; document.head.appendChild(l); });
 
