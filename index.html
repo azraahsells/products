@@ -1339,4 +1339,199 @@ function renderVar(){
     </div>`;
   }).join('');
   const g = gramsOf(x.item);
-  if (!g){ $('v-foot')
+  if (!g){ $('v-foot').innerHTML = ''; return; }
+  const sum = packSum(x, c), price = priceFor(x, g);
+  $('v-foot').innerHTML = `<div class="v-foot">In your cart: <b>${fg(g)}</b> for <b>${rs(price)}</b>${sum > price ? `. We weigh it as the cheapest pack mix, so you pay ${rs(sum - price)} less.` : ''}</div>` + nudgeHTML(x);
+}
+
+/* ---------- cart ---------- */
+function setQty(id, w, d){
+  const x = itemById(id); if (!x || !x.available) return;
+  if (d > 0 && gramsOf(x.item) + w > 20000) return toast('You can order up to 20 kg of one item');
+  const c = S.cart[x.item] || (S.cart[x.item] = {});
+  const n = Math.max(0, (c[w] || 0) + d);
+  if (n) c[w] = n; else delete c[w];
+  if (!Object.keys(c).length) delete S.cart[x.item];
+  S.sel[x.item] = w;
+  S.pop = d > 0 && n === 1 ? id + '-' + w : null;
+  refreshItem(id); updBar(d > 0); S.pop = null;
+  if (navigator.vibrate && d > 0) try{ navigator.vibrate(8); }catch(e){}
+  if (VID === id) renderVar();
+}
+function lines(){
+  return Object.entries(S.cart).map(([item, c]) => {
+    const x = byName(item); if (!x) return null;
+    const g = gramsOf(item);
+    return { item, grams:g, packs:c, amount: priceFor(x,g), list: packSum(x,c), mkt: mktFor(x,g) };
+  }).filter(l => l && l.grams);
+}
+function updBar(bump){
+  const L = lines(), on = L.length > 0 && (S.view === 'shop' || S.view === 'list');
+  const bar = $('cbar');
+  bar.classList.toggle('on', on);
+  if (!L.length) return;
+  const tot = L.reduce((a,l) => a + l.amount, 0) + HANDLING_FEE;
+  const n = L.reduce((a,l) => a + W.reduce((b,w) => b + (l.packs[w]||0), 0), 0);
+  const save = L.reduce((a,l) => a + Math.max(0, l.mkt - l.amount), 0);
+  $('cb-th').innerHTML = L.slice(-3).map(l => `<i>${pic(meta(l.item).art, 1)}</i>`).join('');
+  $('cb-meta').textContent = `${n} pack${n > 1 ? 's' : ''}, ${rs(tot)}`;
+  $('cb-sv').hidden = !save; $('cb-sv').textContent = 'Saving ' + rs(save);
+  if (bump && on){ bar.classList.remove('bump'); void bar.offsetWidth; bar.classList.add('bump'); }
+}
+// honest nudge: when one more 250 g costs less than a normal 250 g pack (it completes a 500 g or 1 kg pack)
+function nudgeFor(x){
+  const g = gramsOf(x.item); if (!g || g + 250 > 20000 || !WS(x).includes(250)) return null;
+  const extra = priceFor(x, g + 250) - priceFor(x, g);
+  if (extra >= x.p250) return null;
+  const to = (g + 250) % 1000 === 0 ? '1 kg' : '500 g';
+  return { extra, save: x.p250 - extra, to };
+}
+function nudgeHTML(x){
+  const nd = nudgeFor(x); if (!nd) return '';
+  return `<button class="nudge" onclick="setQty(${x.id},250,1)${S.view === 'checkout' ? ';renderCheckout()' : ''}"><span>Add 250 g more and get the <b>${nd.to} rate</b></span><span class="pl">+ ${rs(nd.extra)}</span></button>`;
+}
+
+/* ---------- checkout ---------- */
+function goCheckout(){ if (!lines().length) return toast('Add at least one item'); renderCheckout(); show('checkout'); }
+function renderCheckout(){
+  const L = lines(), sub = L.reduce((a,l)=>a+l.amount,0), tot = sub + HANDLING_FEE, g = L.reduce((a,l)=>a+l.grams,0);
+  const saved$ = L.reduce((a,l)=>a + (l.mkt > l.amount ? l.mkt - l.amount : 0), 0);
+  const mix$ = L.reduce((a,l)=>a + Math.max(0, l.list - l.amount), 0);
+  $('sum').innerHTML = L.map(l => `<div class="row"><span style="display:flex;align-items:center"><span class="mini">${pic(meta(l.item).art, 1)}</span><span>${esc(l.item)} <small style="color:var(--tx3)">${fg(l.grams)}</small><br><small style="color:var(--tx3)">${packLabel(l.packs)}</small></span></span><span style="text-align:right">${rs(l.amount)}${l.mkt > l.amount ? `<br><s style="font-size:11px;color:var(--tx3)">${rs(l.mkt)}</s>` : ''}</span></div>${nudgeHTML(byName(l.item))}`).join('')
+    + `<div class="row"><span>Items subtotal (${fg(g)})</span><span>${rs(sub)}</span></div>`
+    + (HANDLING_FEE ? `<div class="row"><span>Handling fee</span><span>${rs(HANDLING_FEE)}</span></div>` : '')
+    + `<div class="row tot"><span>Total</span><span>${rs(tot)}</span></div>`
+    + (saved$ ? `<div class="note" style="margin-top:10px;text-align:center">&#127881; You save <b>${rs(saved$)}</b> compared to market price</div>` : '')
+    + (mix$ ? `<div class="note" style="margin-top:8px;text-align:center">We weigh each item as the cheapest pack mix, which saves you ${rs(mix$)} more.</div>` : '');
+  if (S.user){ ['name','phone','email'].forEach(f => { if (!$('co-'+f).value) $('co-'+f).value = S.user[f]; }); }
+  const saved = load('azraah_addr'); if (saved && !$('co-addr').value) $('co-addr').value = saved;
+}
+$('co-addr').addEventListener('input', () => setErr('addr', false));
+['name','phone','email'].forEach(f => $('co-'+f).addEventListener('input', () => setErr('c'+f, false)));
+$('co-phone').addEventListener('input', e => e.target.value = e.target.value.replace(/\D/g,''));
+document.addEventListener('keydown', e => { if (e.key === 'Escape'){ closeInfo(); closeVar(); } });
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const calm = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+let placing = false;
+async function placeOrder(){
+  if (placing) return;
+  const address = $('co-addr').value.trim(), notes = $('co-notes').value.trim();
+  const name = $('co-name').value.trim().replace(/\s+/g,' ');
+  const phone = $('co-phone').value.replace(/\D/g,'').slice(-10);
+  const email = $('co-email').value.trim().toLowerCase();
+  const bad = { cname: name.length < 2, cphone: !/^[6-9]\d{9}$/.test(phone),
+    cemail: !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email), addr: address.length < 8 };
+  Object.entries(bad).forEach(([f,b]) => setErr(f,b));
+  const first = Object.keys(bad).find(f => bad[f]);
+  if (first){
+    show('checkout');
+    const el = first === 'addr' ? $('co-addr') : $('co-' + first.slice(1));
+    el.focus(); el.scrollIntoView({ block:'center', behavior:'smooth' });
+    return;
+  }
+  const prev = S.user;
+  S.user = { name, phone, email };
+  store(LS_KEY, S.user); refreshUser(); recordCustomer(prev);
+  placing = true;
+  if (ratesP) await ratesP.catch(() => {});   // never place an order on old saved rates
+  const L = lines(); if (!L.length){ placing = false; return; }
+  const btn = $('place-btn'); btn.disabled = true; btn.textContent = 'Placing order…';
+  const payload = { action:'order', ...S.user, address, notes, items: L.map(l => ({ item:l.item, grams:l.grams })) };
+
+  // 1. load the package into the van while the order is sent
+  const dn = $('dn'); dn.className = 'dn'; void dn.offsetWidth;
+  $('dn-cap').textContent = 'Packing your order…';
+  show('done'); dn.classList.add('packing');
+  const t0 = Date.now();
+  const capT = setTimeout(() => { $('dn-cap').textContent = 'Sending it to Azraah…'; }, 1700);
+  let res;
+  try{
+    if (!SCRIPT_URL){ await sleep(900); res = { ok:true, orderId:'AZ-DEMO', total:L.reduce((a,l)=>a+l.amount,0) + HANDLING_FEE }; }
+    else {
+      const r = await fetch(SCRIPT_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(payload) });
+      res = await r.json();
+    }
+  }catch(e){ res = { ok:false, error:'Network problem. Check your connection and try again.' }; }
+  if (!calm()) await sleep(Math.max(0, 2050 - (Date.now() - t0)));
+  clearTimeout(capT);
+  btn.disabled = false; btn.textContent = 'Place order'; placing = false;
+
+  if (!res.ok){
+    dn.classList.remove('packing'); dn.classList.add('failed');
+    $('fail-msg').textContent = (res.error || 'Something went wrong on our side.') + ' Your cart and address are still saved.';
+    return;
+  }
+  store('azraah_addr', address);
+  store('azraah_last', { cart: JSON.parse(JSON.stringify(S.cart)), at: Date.now() });
+  $('done-id').textContent = 'Order ' + res.orderId;
+  $('done-p').innerHTML = `Thank you, ${esc(S.user.name.split(' ')[0])}! We’ve sent a confirmation to <b>${esc(S.user.email)}</b>. Your total is <b>${rs(res.total)}</b>.`;
+
+  // 2. van drives off  3. check mark + celebration
+  $('dn-cap').textContent = 'On its way…';
+  dn.classList.remove('packing'); dn.classList.add('driving');
+  if (!calm()) await sleep(950);
+  dn.classList.add('done-ok');
+  if (!calm()){
+    setTimeout(() => celebrate(), 520);
+    if (navigator.vibrate) try{ navigator.vibrate([30, 60, 90]); }catch(e){}
+  }
+  S.cart = {}; S.sel = {}; renderAll();
+}
+
+/* ---------- celebration: dry-fruit + saffron confetti ---------- */
+const PIECES = {};
+function pieceImg(kind){
+  if (PIECES[kind]) return PIECES[kind];
+  const a = ART[kind], id = 'cf' + kind;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-22 -22 44 44" width="44" height="44"><defs><radialGradient id="${id}" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="${a.c[0]}"/><stop offset="1" stop-color="${a.c[1]}"/></radialGradient></defs>${a.p.replace(/fill="G"/g, `fill="url(#${id})"`)}</svg>`;
+  const img = new Image(); img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  return PIECES[kind] = img;
+}
+['cashew','almond','pista','blackraisin','goldraisin'].forEach(pieceImg);
+function celebrate(){
+  const cv = $('confetti'), ctx = cv.getContext('2d'), dpr = Math.min(2, window.devicePixelRatio || 1);
+  const W2 = cv.clientWidth, H2 = cv.clientHeight;
+  cv.width = W2 * dpr; cv.height = H2 * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const colors = ['#EDBE6A','#5B1B5E','#C98535','#F6D98F','#8E3B6E','#FFE7A8'];
+  const kinds = ['cashew','almond','pista','blackraisin','goldraisin'];
+  const ps = [];
+  const st = $('scene').getBoundingClientRect(), ar = $('app').getBoundingClientRect();
+  const cx = st.left - ar.left + st.width/2, cy = st.top - ar.top + st.height/2;
+  const burst = (x, y, n, spread, up) => { for (let i = 0; i < n; i++){
+    const ang = up + (Math.random() - .5) * spread, sp = 5 + Math.random() * 8, nut = Math.random() < .42;
+    ps.push({ x, y, vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp, r: Math.random()*6.28, vr: (Math.random()-.5)*.35,
+      nut, img: nut ? PIECES[kinds[i % kinds.length]] : null, s: nut ? 16 + Math.random()*10 : 6 + Math.random()*5,
+      c: colors[i % colors.length], w: Math.random() < .5, star: Math.random() < .3, life: 0 }); } };
+  burst(cx, cy, 70, Math.PI * 2, 0);
+  setTimeout(() => { burst(0, H2 * .8, 35, .7, -Math.PI/3); burst(W2, H2 * .8, 35, .7, -Math.PI*2/3); }, 260);
+  const t0 = performance.now();
+  (function frame(t){
+    ctx.clearRect(0, 0, W2, H2);
+    ps.forEach(p => {
+      p.vy += .28; p.vx *= .985; p.vy *= .985; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.life++;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r);
+      ctx.globalAlpha = Math.max(0, 1 - (t - t0) / 3200);
+      if (p.nut && p.img && p.img.complete) ctx.drawImage(p.img, -p.s/2, -p.s/2, p.s, p.s);
+      else if (p.star){ const r = p.s*.9; ctx.fillStyle = '#F6D98F'; ctx.beginPath(); for (let k = 0; k < 8; k++){ const rr = k % 2 ? r*.28 : r; const a = k*Math.PI/4; ctx.lineTo(Math.cos(a)*rr, Math.sin(a)*rr); } ctx.closePath(); ctx.fill(); }
+      else { ctx.fillStyle = p.c; if (p.w) ctx.fillRect(-p.s/2, -p.s/4, p.s, p.s/2); else { ctx.beginPath(); ctx.arc(0, 0, p.s/3, 0, 6.28); ctx.fill(); } }
+      ctx.restore();
+    });
+    if (t - t0 < 3200) requestAnimationFrame(frame); else ctx.clearRect(0, 0, W2, H2);
+  })(t0);
+}
+function newOrder(){ S.cart = {}; S.sel = {}; $('co-notes').value = ''; $('dn').className = 'dn'; renderAll(); show('shop'); $('shop-scr').scrollTop = 0; }
+
+/* ---------- boot ---------- */
+(function paintDiwali(){
+  $('hd-art').innerHTML = `<span class="hm">${mandala(120)}</span>` + diyas(150, 60, [[18, 20, .55], [58, 38, .7], [98, 14, .5], [134, 30, .62]]);
+  $('dn-art').innerHTML = diyas(400, 110, [[50, 40, .8], [130, 70, 1], [270, 56, .9], [350, 30, .7]]);
+  $('lh-art').innerHTML = mandala(130);
+})();
+
+S.user = load(LS_KEY);
+if (S.user && !(S.user.name && S.user.phone && S.user.email)) S.user = null;
+goShop();   // land every customer straight on the products
+</script>
+</body>
+</html>
