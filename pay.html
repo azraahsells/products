@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Opening your UPI app…</title>
+<style>
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#FFF9F1;font-family:Arial,Helvetica,sans-serif;color:#1E1209;text-align:center}
+  .box{padding:24px;max-width:340px}
+  .sp{width:34px;height:34px;border:3px solid #EFD3A0;border-top-color:#5B1B5E;border-radius:50%;margin:0 auto 14px;animation:r .8s linear infinite}
+  @keyframes r{to{transform:rotate(360deg)}}
+  #fb{display:none;margin-top:8px}
+  a.b{display:block;margin:8px 0;padding:13px;border-radius:10px;background:#5B1B5E;color:#fff;text-decoration:none;font-weight:bold}
+  small{color:#6B4C2A;line-height:1.5;display:block;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="sp" id="sp"></div>
+  <div id="msg">Opening your UPI app…</div>
+  <!-- only shown if the phone didn't open an app by itself -->
+  <div id="fb">
+    <a class="b" id="any">Open UPI app</a>
+    <a class="b" id="gp" style="background:#1a73e8">Google Pay</a>
+    <a class="b" id="pp" style="background:#5f259f">PhonePe</a>
+    <a class="b" id="pt" style="background:#00b9f1">Paytm</a>
+    <small>Or open any UPI app and pay to <b id="vpa"></b><br>with your order ID in the note.</small>
+  </div>
+</div>
+<script>
+// ======= EDIT IF YOUR UPI DETAILS CHANGE =======
+const UPI_ID   = 'shaikhalim55@okicici';
+const UPI_NAME = 'Shaikh Alim Amin';
+// ===============================================
+const order = (new URLSearchParams(location.search).get('o') || '').replace(/[^\w-]/g, '').slice(0, 20);
+// No amount in the link: the customer types it in the app (avoids warnings for personal UPI IDs)
+const q = 'pa=' + encodeURIComponent(UPI_ID) + '&pn=' + encodeURIComponent(UPI_NAME) + '&cu=INR'
+        + (order ? '&tn=' + encodeURIComponent('Order ' + order) : '');
+const android = /Android/i.test(navigator.userAgent);
+const upi = 'upi://pay?' + q;
+// On Android an "intent" link makes the phone show its UPI apps (GPay, PhonePe, Paytm…) straight away
+const direct = android ? 'intent://pay?' + q + '#Intent;scheme=upi;end' : upi;
+
+document.getElementById('vpa').textContent = UPI_ID;
+document.getElementById('any').href = direct;
+document.getElementById('gp').href = android ? 'intent://upi/pay?' + q + '#Intent;scheme=tez;package=com.google.android.apps.nbu.paisa.user;end' : 'gpay://upi/pay?' + q;
+document.getElementById('pp').href = 'phonepe://pay?' + q;
+document.getElementById('pt').href = 'paytmmp://pay?' + q;
+
+// Jump straight into the UPI app
+location.replace(direct);
+
+// If we're still here after a moment (app not installed / browser blocked it), show buttons
+setTimeout(() => {
+  if (document.hidden) return;            // the app opened
+  document.getElementById('sp').style.display = 'none';
+  document.getElementById('msg').textContent = 'Tap to pay with your UPI app';
+  document.getElementById('fb').style.display = 'block';
+}, 1500);
+</script>
+</body>
+</html>
